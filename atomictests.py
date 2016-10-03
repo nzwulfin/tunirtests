@@ -174,5 +174,63 @@ class TestDockerDaemon(unittest.TestCase):
         out = out.decode('utf-8')
         self.assertIn('Server:\n Version', out)
 
+@unittest.skipUnless(if_atomic(), "It's not an Atomic image")
+class TestUpgrade(unittest.TestCase):
+
+    def setup(self):
+        # Compare the checksum of the booted tree against the stored checksum
+        # of the locally created 'noop' upgrade tree
+        # If passed upgrade, test the booted tree matches the 'noop' upgrade tree
+
+        import json
+        import subprocess
+
+        target_id = ""
+        deploy_id = ""
+        id_source = "synth_upgrade.txt"
+
+        # Read the status output to determine trees booted and deployed
+        atomic_status = subprocess.check_output(['atomic', 'host', 'status', '--json'])
+        data = json.loads(atomic_status)
+
+        for r in data['deployments']:
+            if r['booted'] is True:
+                self.deploy_id=r['checksum']
+
+        with open(id_source, "r")as text_file:
+            self.target_id = text_file.read()
+
+    def test_upgrade(self):
+        self.assertEqual(self.target_id, self.deploy_id)
+
+@unittest.skipUnless(if_atomic(), "It's not an Atomic image")
+class TestRollback(unittest.TestCase):
+
+    def setup(self):
+        # Compare the checksum of the booted tree against the stored checksum
+        # of the locally created 'noop' tree
+        # Used to sanity check inital setup of 'noop' tree
+        # If passed rollback, test the booted tree matches the original 'noop' tree
+
+        import json
+        import subprocess
+
+        id_source = "synth_origin.txt"
+
+        # Read the status output to determine trees booted and deployed
+        atomic_status = subprocess.check_output(['atomic', 'host', 'status', '--json'])
+        data = json.loads(atomic_status)
+
+        for r in data['deployments']:
+            if r['booted'] is True:
+                self.deploy_id=r['checksum']
+
+        with open(id_source, "r")as text_file:
+            self.target_id = text_file.read()
+
+    def test_upgrade(self):
+        self.assertEqual(self.target_id, self.deploy_id)
+
+
 if __name__ == '__main__':
     unittest.main()

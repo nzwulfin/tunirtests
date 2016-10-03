@@ -19,7 +19,12 @@ for r in data['deployments']:
 
 synthetic = subprocess.check_output(["sudo", "ostree", "commit", "-b", ref_spec, "--tree=ref=%s" % tree])
 
-with open("target_commit.txt", "w")as text_file:
+with open("synth_origin.txt", "w")as text_file:
     text_file.write(synthetic.rstrip())
 
 deploy = subprocess.check_output(["sudo", "ostree", "admin", "deploy", ref_spec])
+
+upgrade_tree = subprocess.check_output(["sudo", "ostree", "commit", "-b", ref_spec, "--tree=ref=%s" % ref_spec])
+
+with open("synth_upgrade.txt", "w")as text_file:
+    text_file.write(upgrade_tree.rstrip())
