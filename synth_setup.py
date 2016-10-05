@@ -9,7 +9,7 @@ import subprocess
 tree = ""
 ref_spec = "synth_test"
 
-atomic_status = subprocess.check_output(['atomic', 'host', 'status', '--json'])
+atomic_status = subprocess.check_output(['atomic', 'host', 'status', '--json']).decode('utf-8')
 
 data = json.loads(atomic_status)
 
@@ -19,12 +19,12 @@ for r in data['deployments']:
 
 synthetic = subprocess.check_output(["sudo", "ostree", "commit", "-b", ref_spec, "--tree=ref=%s" % tree])
 
-with open("synth_origin.txt", "w")as text_file:
+with open("synth_origin.txt", "wb")as text_file:
     text_file.write(synthetic.rstrip())
 
 deploy = subprocess.check_output(["sudo", "ostree", "admin", "deploy", ref_spec])
 
 upgrade_tree = subprocess.check_output(["sudo", "ostree", "commit", "-b", ref_spec, "--tree=ref=%s" % ref_spec])
 
-with open("synth_upgrade.txt", "w")as text_file:
+with open("synth_upgrade.txt", "wb")as text_file:
     text_file.write(upgrade_tree.rstrip())

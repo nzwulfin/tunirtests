@@ -177,7 +177,7 @@ class TestDockerDaemon(unittest.TestCase):
 @unittest.skipUnless(if_atomic(), "It's not an Atomic image")
 class TestUpgrade(unittest.TestCase):
 
-    def setup(self):
+    def test_upgrade(self):
         # Compare the checksum of the booted tree against the stored checksum
         # of the locally created 'noop' upgrade tree
         # If passed upgrade, test the booted tree matches the 'noop' upgrade tree
@@ -185,28 +185,25 @@ class TestUpgrade(unittest.TestCase):
         import json
         import subprocess
 
-        target_id = ""
-        deploy_id = ""
         id_source = "synth_upgrade.txt"
 
         # Read the status output to determine trees booted and deployed
-        atomic_status = subprocess.check_output(['atomic', 'host', 'status', '--json'])
+        atomic_status = subprocess.check_output(['atomic', 'host', 'status', '--json']).decode('utf-8')
         data = json.loads(atomic_status)
 
         for r in data['deployments']:
             if r['booted'] is True:
-                self.deploy_id=r['checksum']
+                deploy_id=r['checksum']
 
         with open(id_source, "r")as text_file:
-            self.target_id = text_file.read()
+            target_id = text_file.read()
 
-    def test_upgrade(self):
-        self.assertEqual(self.target_id, self.deploy_id)
+        self.assertEqual(target_id, deploy_id)
 
 @unittest.skipUnless(if_atomic(), "It's not an Atomic image")
 class TestRollback(unittest.TestCase):
 
-    def setup(self):
+    def test_upgrade(self):
         # Compare the checksum of the booted tree against the stored checksum
         # of the locally created 'noop' tree
         # Used to sanity check inital setup of 'noop' tree
@@ -218,18 +215,17 @@ class TestRollback(unittest.TestCase):
         id_source = "synth_origin.txt"
 
         # Read the status output to determine trees booted and deployed
-        atomic_status = subprocess.check_output(['atomic', 'host', 'status', '--json'])
+        atomic_status = subprocess.check_output(['atomic', 'host', 'status', '--json']).decode('utf-8')
         data = json.loads(atomic_status)
 
         for r in data['deployments']:
             if r['booted'] is True:
-                self.deploy_id=r['checksum']
+                deploy_id=r['checksum']
 
         with open(id_source, "r")as text_file:
-            self.target_id = text_file.read()
+            target_id = text_file.read()
 
-    def test_upgrade(self):
-        self.assertEqual(self.target_id, self.deploy_id)
+        self.assertEqual(target_id, deploy_id)
 
 
 if __name__ == '__main__':

@@ -12,7 +12,7 @@ sudo python3 -m unittest tunirtests.cloudservice.TestServiceAfter -v
 sudo python3 -m unittest tunirtests.atomictests.TestAtomicCommand
 sudo python3 -m unittest tunirtests.atomictests.TestDockerInstalled -v
 sudo python3 -m unittest tunirtests.atomictests.TestDockerStorageSetup -v
-sudo python3 synth_setup.py -v
+sudo python3 tunirtests/synth_setup.py
 @@ sudo reboot
 SLEEP 60
 sudo python3 -m unittest tunirtests.atomictests.TestRollback
